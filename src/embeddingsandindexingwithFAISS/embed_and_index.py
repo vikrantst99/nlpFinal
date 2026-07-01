@@ -9,8 +9,6 @@ def main():
 
     df = pd.read_csv("data/chunked/nvidia_article_chunks.csv")
 
-    print("Total chunks loaded:", len(df))
-
     alles = []
     for i, j in df.iterrows():
         doc = Document(page_content=j["chunk_text"],
@@ -21,22 +19,14 @@ def main():
                                   "published":  j["published"]})
         alles.append(doc)
 
-    print("Total Document objects created:", len(alles))
     # docs: https://python.langchain.com/docs/integrations/text_embedding/sentence_transformers/
     model = HuggingFaceEmbeddings(model_name="BAAI/bge-base-en-v1.5", model_kwargs={"device": "cpu"}, encode_kwargs={"normalize_embeddings": True})
 
-    print("Embedding model loaded.")
-
     vector_store = FAISS.from_documents(documents=alles, embedding=model)
-
-    print("FAISS vector store built.")
 
     save_dir = "data/embeddings/EMBEDDINGS&FAISS"
     os.makedirs(save_dir, exist_ok=True)
     vector_store.save_local(save_dir)
-
-    print("Saved to", save_dir)
-
 
 if __name__ == "__main__":
     main()
